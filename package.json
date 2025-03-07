@@ -1,8 +1,8 @@
 {
   "name": "@did-btc1/bip340-key-pair",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
-  "description": "Secp256k1 key pair implementation for @did-btc1/bip340-cryptosuite",
+  "description": "JavaScript/TypeScript implementation of a secp256k1 public/private key pairs with BIP340 schnorr signatures. Implementated for use within the @did-btc1/bip340-2025-cryptosuite.",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
@@ -13,7 +13,7 @@
       "require": "./dist/cjs/index.js"
     }
   },
-  "license": "The Unlicense",
+  "license": "MPL-2.0",
   "contributors": [
     {
       "name": "jintekc",
@@ -21,33 +21,57 @@
       "url": "https://github.com/jintekc"
     }
   ],
-  "homepage": "TBD",
+  "homepage": "https://github.com/jintekc/bip340-key-pair",
   "repository": {
     "type": "git",
-    "url": "TBD"
+    "url": "git+ssh://git@github.com:jintekc/bip340-key-pair.git"
   },
-  "bugs": "TBD",
+  "bugs": "https://github.com/jintekc/bip340-key-pair",
   "publishConfig": {
     "access": "public"
   },
   "engines": {
     "node": ">=22.0.0"
   },
-  "keywords": [],
+  "keywords": [
+    "did",
+    "dids",
+    "decentralized identity",
+    "decentralized identifiers",
+    "did method",
+    "did:btc1",
+    "bitcoin",
+    "data integrity",
+    "schnorr",
+    "schnorr signatures",
+    "secp256k1",
+    "secp256k1 key pair",
+    "cryptosuite",
+    "bip340",
+    "bip340 key pair",
+    "data integrity bip340",
+    "data integrity bip340 cryptosuite"
+  ],
   "scripts": {
-    "wipe": "rimraf node_modules pnpm-lock.yaml",
-    "start": "node ./dist/cjs/index.js",
+    "del": "rimraf",
     "clean": "rimraf dist coverage tests/compiled",
+    "wipe": "rimraf node_modules pnpm-lock.json",
+    "wipe:clean": "pnpm wipe && pnpm clean",
+    "reinstall": "pnpm wipe:clean && pnpm install",
     "build": "pnpm clean && pnpm build:esm && pnpm build:cjs",
     "build:esm": "rimraf dist/esm dist/types && pnpm tsc -p tsconfig.json",
     "build:cjs": "rimraf dist/cjs && tsc -p tsconfig.cjs.json && echo '{\"type\": \"commonjs\"}' > ./dist/cjs/package.json",
-    "build:tests:node": "rimraf tests/compiled && pnpm tsc -p tests/tsconfig.json",
+    "build:tests": "rimraf tests/compiled && pnpm tsc -p tests/tsconfig.json",
+    "release": "pnpm build && pnpm pack && mv *.tgz releases",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
-    "test:node": "pnpm build:tests:node && pnpm c8 mocha",
-    "build:test": "pnpm build && pnpm build:tests:node && pnpm test:node",
-    "build:lint:test": "pnpm build && pnpm build:tests:node && pnpm lint:fix",
-    "prepublish": "pnpm build"
+    "test": "pnpm build && pnpm build:tests && pnpm c8 mocha",
+    "test:node": "pnpm c8 mocha",
+    "build:lint:test": "pnpm build && pnpm build:tests && pnpm lint:fix",
+    "prepublish": "pnpm build",
+    "version": "pnpm version",
+    "version:no-git": "pnpm version --no-commit-hooks --no-git-tag-version",
+    "version:new": "[ -z \"$NEW_VERSION\" ] && echo 'ERROR: NEW_VERSION is not set' && exit 1 || (git checkout -b $NEW_VERSION && git tag $NEW_VERSION && pnpm version:no-git $NEW_VERSION)"
   },
   "dependencies": {
     "@noble/hashes": "^1.7.1",
