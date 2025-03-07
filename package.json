@@ -1,0 +1,85 @@
+{
+  "name": "@did-btc1/bip340-key-pair",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Secp256k1 key pair implementation for @did-btc1/bip340-cryptosuite",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "license": "The Unlicense",
+  "contributors": [
+    {
+      "name": "jintekc",
+      "email": "info@jintek.consulting",
+      "url": "https://github.com/jintekc"
+    }
+  ],
+  "homepage": "TBD",
+  "repository": {
+    "type": "git",
+    "url": "TBD"
+  },
+  "bugs": "TBD",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [],
+  "scripts": {
+    "wipe": "rimraf node_modules pnpm-lock.yaml",
+    "start": "node ./dist/cjs/index.js",
+    "clean": "rimraf dist coverage tests/compiled",
+    "build": "pnpm clean && pnpm build:esm && pnpm build:cjs",
+    "build:esm": "rimraf dist/esm dist/types && pnpm tsc -p tsconfig.json",
+    "build:cjs": "rimraf dist/cjs && tsc -p tsconfig.cjs.json && echo '{\"type\": \"commonjs\"}' > ./dist/cjs/package.json",
+    "build:tests:node": "rimraf tests/compiled && pnpm tsc -p tests/tsconfig.json",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "test:node": "pnpm build:tests:node && pnpm c8 mocha",
+    "build:test": "pnpm build && pnpm build:tests:node && pnpm test:node",
+    "build:lint:test": "pnpm build && pnpm build:tests:node && pnpm lint:fix",
+    "prepublish": "pnpm build"
+  },
+  "dependencies": {
+    "@noble/hashes": "^1.7.1",
+    "multiformats": "^13.3.2",
+    "tiny-secp256k1": "^2.2.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "@types/chai": "^5.0.1",
+    "@types/chai-as-promised": "^8.0.1",
+    "@types/eslint": "^9.6.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.13.4",
+    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/parser": "^8.24.1",
+    "c8": "^10.1.3",
+    "chai": "^5.2.0",
+    "chai-as-promised": "^8.0.1",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.20.1",
+    "eslint-plugin-mocha": "^10.5.0",
+    "globals": "^15.15.0",
+    "mocha": "^11.1.0",
+    "mocha-junit-reporter": "^2.2.1",
+    "node-stdlib-browser": "^1.3.1",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
