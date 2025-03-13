@@ -1,6 +1,6 @@
 import { PrivateKey } from './private-key.js';
 import { PublicKey } from './public-key.js';
-import { Hex, PrefixBytes, PrivateKeyBytes, PublicKeyBytes, PublicKeyMultibaseBytes } from './types.js';
+import { Hex, KeyPairJSON, PrefixBytes, PrivateKeyBytes, PrivateKeyJSON, PrivateKeyPoint, PrivateKeySecret, PublicKeyBytes, PublicKeyJSON, PublicKeyMultibaseBytes } from './types.js';
 
 /**
  * Interface for the PrivateKey class.
@@ -18,15 +18,15 @@ export interface IPrivateKey {
   /**
    * Getter returns the private key bytes in secret form.
    * Setter allows alternative method of using a bigint secret to genereate the private key bytes.
-   * @type {BigInt} The private key secret.
+   * @type {PrivateKeySecret} The private key secret.
    */
-  secret: BigInt;
+  secret: PrivateKeySecret;
 
   /**
    * Get the private key point
-   * @readonly @type {BigInt} The private key point.
+   * @readonly @type {PrivateKeyPoint} The private key point.
    */
-  point: BigInt;
+  point: PrivateKeyPoint;
 
   /**
    * Returns the private key as a hex string
@@ -56,6 +56,13 @@ export interface IPrivateKey {
    * @returns {boolean} Whether the private key is valid.
    */
   isValid(): boolean;
+
+
+  /**
+   * JSON representation of a PrivateKey object.
+   * @returns {PrivateKeyJSON} The PrivateKey as a JSON object.
+   */
+  json(): PrivateKeyJSON;
 }
 
 
@@ -132,6 +139,12 @@ export interface IPublicKey {
    * @returns {boolean} True if the public keys are equal.
    */
   equals(other: PublicKey): boolean;
+
+  /**
+   * JSON representation of a PublicKey object.
+   * @returns {PublicKeyJSON} The PublicKey as a JSON object.
+   */
+  json(): PublicKeyJSON;
 }
 
 /**
@@ -144,7 +157,7 @@ export interface IKeyPair {
   /**
    * @type {PublicKey} Get/set the public key associated with the key pair (required)
    */
-  publicKey: PublicKey;
+  readonly publicKey: PublicKey;
 
   /**
    * @readonly
@@ -152,4 +165,11 @@ export interface IKeyPair {
    * @throws {KeyPairError} If the private key is not available
    */
   readonly privateKey?: PrivateKey;
+
+
+  /**
+   * JSON representation of a KeyPair object.
+   * @returns {KeyPairJSON} The key pair as a JSON object.
+   */
+  json(): KeyPairJSON;
 }

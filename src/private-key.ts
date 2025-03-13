@@ -4,7 +4,7 @@ import { CURVE } from './constants.js';
 import { PrivateKeyError } from './error.js';
 import { IPrivateKey } from './interface.js';
 import { PublicKey } from './public-key.js';
-import { Hex, PrivateKeyBytes, PrivateKeySecret, PrivateKeySeed, PublicKeyBytes } from './types.js';
+import { Hex, PrivateKeyBytes, PrivateKeyJSON, PrivateKeySecret, PrivateKeySeed, PublicKeyBytes } from './types.js';
 
 /**
  * Encapsulates a secp256k1 private key
@@ -20,7 +20,7 @@ export class PrivateKey implements IPrivateKey {
   private _bytes?: PrivateKeyBytes;
 
   /** @type {PrivateKeySecret} The bigint private key secret */
-  private _secret?: BigInt;
+  private _secret?: PrivateKeySecret;
 
   /**
    * Instantiates an instance of PrivateKey.
@@ -84,13 +84,13 @@ export class PrivateKey implements IPrivateKey {
    * Return the private key secret.
    * @see IPrivateKey.secret
    */
-  get secret(): BigInt {
+  get secret(): bigint {
     // Convert private key bytes to a bigint
     if(!this._secret) {
       this._secret = PrivateKeyUtils.toSecret(this.bytes);
     }
     // Memoize the secret and return
-    const secret = BigInt(this._secret as bigint);
+    const secret = this._secret as bigint;
     return secret;
   }
 
@@ -166,6 +166,19 @@ export class PrivateKey implements IPrivateKey {
    */
   public isValid(): boolean {
     return PrivateKeyUtils.isValid(this.bytes);
+  }
+
+  /**
+   * Returns the private key as a JSON object.
+   * @see IPrivateKey.json
+   */
+  public json(): PrivateKeyJSON {
+    return {
+      bytes  : this.bytes,
+      secret : this.secret as bigint,
+      point  : this.point,
+      hex    : this.hex(),
+    };
   }
 }
 
