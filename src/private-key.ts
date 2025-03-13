@@ -30,27 +30,27 @@ export class PrivateKey implements IPrivateKey {
    */
   constructor(seed: PrivateKeySeed) {
     // If no bytes or secret, throw error
-    if(!seed) {
+    const isBytes = seed instanceof Uint8Array;
+    const isSecret = typeof seed === 'bigint';
+    if(!isBytes && !isSecret) {
       throw new PrivateKeyError(
-        'Invalid argument: must provide a 32-byte private key or a bigint secret',
+        'Invalid seed: must be 32-byte Uint8Array or bigint secret',
         'PRIVATE_KEY_CONSTRUCTOR_ERROR'
       );
     }
 
     // If bytes and bytes are not length 32
-    const isBytes = seed instanceof Uint8Array;
     if (isBytes && seed.length !== 32) {
       throw new PrivateKeyError(
-        'Invalid argument: must provide a 32-byte private key',
+        'Invalid seed: must be a valid 32-byte private key',
         'PRIVATE_KEY_CONSTRUCTOR_ERROR'
       );
     }
 
     // If secret and secret is not a valid bigint, throw error
-    const isSecret = typeof seed === 'bigint';
     if (isSecret && (seed < 1n || seed >= CURVE.n)) {
       throw new PrivateKeyError(
-        'Invalid argument: secret out of valid range',
+        'Invalid seed: must must be a valid bigint secret',
         'PRIVATE_KEY_CONSTRUCTOR_ERROR'
       );
     }
@@ -60,8 +60,8 @@ export class PrivateKey implements IPrivateKey {
     const seedSecret = seed as PrivateKeySecret;
 
     // Set the private key _bytes and _secret
-    this._bytes = seedBytes ?? PrivateKeyUtils.toBytes(seedSecret);
-    this._secret = seedSecret ?? PrivateKeyUtils.toSecret(seedBytes);
+    this._bytes = isSecret ? PrivateKeyUtils.toBytes(seedSecret) : seedBytes;
+    this._secret = isBytes ? PrivateKeyUtils.toSecret(seedBytes) : seedSecret;
   }
 
   /**
@@ -69,15 +69,9 @@ export class PrivateKey implements IPrivateKey {
    * @see IPrivateKey.bytes
    */
   get bytes(): Uint8Array {
-    // If no private key bytes, throw an error
-    if (!this._bytes) {
-      throw new PrivateKeyError(
-        'Missing variable: private key not set',
-        'GET_RAW_PRIVATE_KEY_ERROR'
-      );
-    }
     // Return a copy of the private key bytes
-    return new Uint8Array(this._bytes);
+    const bytes = new Uint8Array(this._bytes!);
+    return bytes;
   }
 
   /**
@@ -85,12 +79,8 @@ export class PrivateKey implements IPrivateKey {
    * @see IPrivateKey.secret
    */
   get secret(): bigint {
-    // Convert private key bytes to a bigint
-    if(!this._secret) {
-      this._secret = PrivateKeyUtils.toSecret(this.bytes);
-    }
     // Memoize the secret and return
-    const secret = this._secret as bigint;
+    const secret = BigInt(this._secret!) as bigint;
     return secret;
   }
 
@@ -130,7 +120,7 @@ export class PrivateKey implements IPrivateKey {
    * @see IPrivateKey.hex
    * @returns {Hex} The private key as a hex string
    */
-  public hex(): Hex {
+  get hex(): Hex {
     // Convert the raw private key bytes to a hex string
     return Buffer.from(this.bytes).toString('hex');
   }
@@ -144,7 +134,7 @@ export class PrivateKey implements IPrivateKey {
    */
   public equals(other: PrivateKey): boolean {
     // Compare the hex strings of the private keys
-    return this.hex() === other.hex();
+    return this.hex === other.hex;
   }
 
   /**
@@ -177,7 +167,7 @@ export class PrivateKey implements IPrivateKey {
       bytes  : this.bytes,
       secret : this.secret as bigint,
       point  : this.point,
-      hex    : this.hex(),
+      hex    : this.hex,
     };
   }
 }

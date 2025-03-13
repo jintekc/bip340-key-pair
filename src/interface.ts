@@ -10,7 +10,7 @@ import { Hex, KeyPairJSON, PrefixBytes, PrivateKeyBytes, PrivateKeyJSON, Private
  */
 export interface IPrivateKey {
   /**
-   * Get the private key bytes
+   * Get the private key bytes.
    * @readonly @type {PrivateKeyBytes} The private key bytes.
    */
   bytes: PrivateKeyBytes;
@@ -23,22 +23,21 @@ export interface IPrivateKey {
   secret: PrivateKeySecret;
 
   /**
-   * Get the private key point
+   * Get the private key point.
    * @readonly @type {PrivateKeyPoint} The private key point.
    */
   point: PrivateKeyPoint;
 
   /**
-   * Returns the private key as a hex string
-   * @public
-   * @returns {Hex} The private key as a hex string
+   * Get the private key as a hex string.
+   * @readonly @type {Hex} The private key as a hex string.
    */
-  hex(): Hex;
+  hex: Hex;
 
   /**
-   * Checks if this private key is equal to another private key
+   * Checks if this private key is equal to another private key.
    * @public
-   * @returns {boolean} True if the private keys are equal
+   * @returns {boolean} True if the private keys are equal.
    */
   equals(other: PrivateKey): boolean;
 
@@ -46,7 +45,7 @@ export interface IPrivateKey {
    * Uses the private key to compute the corresponding public key.
    * @see PrivateKeyUtils.computePublicKey
    * @public
-   * @returns {PublicKey} A new PublicKey object
+   * @returns {PublicKey} A new PublicKey object.
    */
   computePublicKey(): PublicKey;
 
@@ -74,64 +73,64 @@ export interface IPrivateKey {
  */
 export interface IPublicKey {
   /**
-   * Compressed public key getter
-   * @type {PublicKeyBytes} The 33 byte compressed public key [parity, x-coord]
+   * Compressed public key getter.
+   * @type {PublicKeyBytes} The 33 byte compressed public key [parity, x-coord].
    */
   bytes: PublicKeyBytes;
 
   /**
-   * Uncompressed public key getter
-   * @type {PublicKeyBytes} The 65 byte uncompressed public key [0x04, x-coord, y-coord]
+   * Uncompressed public key getter.
+   * @readonly @type {PublicKeyBytes} The 65 byte uncompressed public key [0x04, x-coord, y-coord].
    */
   uncompressed: PublicKeyBytes;
 
   /**
-   * Public key parity getter
-   * @type {number} The 1 byte parity (0x02 if even, 0x03 if odd)
+   * Public key parity getter.
+   * @readonly @type {number} The 1 byte parity (0x02 if even, 0x03 if odd).
    */
   parity: number;
 
   /**
-   * Public key x-coordinate getter
-   * @type {PublicKeyBytes} The 32 byte x-coordinate of the public key
+   * Public key x-coordinate getter.
+   * @readonly @type {PublicKeyBytes} The 32 byte x-coordinate of the public key.
    */
   x: PublicKeyBytes;
 
   /**
-   * Public key y-coordinate getter
-   * @type {PublicKeyBytes} The 32 byte y-coordinate of the public key
+   * Public key y-coordinate getter.
+   * @readonly @type {PublicKeyBytes} The 32 byte y-coordinate of the public key.
    */
   y: PublicKeyBytes;
 
   /**
-   * Public key multibase getter
-   * @returns {string} The public key as a base58btc multibase string
+   * Public key multibase getter.
+   * @readonly @returns {string} The public key as a base58btc multibase string.
    */
   multibase: string;
 
   /**
-   * Public key multibase prefix getter
-   * @type {PrefixBytes} The 2 byte multibase prefix
+   * Public key multibase prefix getter.
+   * @readonly @type {PrefixBytes} The 2 byte multibase prefix.
    */
   prefix: PrefixBytes;
 
   /**
-   * Decode the base58btc multibase string to the compressed public key prefixed with 0x02
+   * Public key hex string getter.
+   * @readonly @type {Hex} The public key as a hex string.
+   */
+  hex: Hex;
+
+  /**
+   * Decode the base58btc multibase string to the compressed public key prefixed with 0x02.
    * @returns {PublicKeyMultibaseBytes} The public key as a 33-byte compressed public key with header.
    */
   decode(): PublicKeyMultibaseBytes;
 
   /**
-   * Encode the PublicKey as an x-only base58btc multibase public key
-   * @returns {string} The public key formatted a base58btc multibase string
+   * Encode the PublicKey as an x-only base58btc multibase public key.
+   * @returns {string} The public key formatted a base58btc multibase string.
    */
   encode(): string;
-
-  /**
-   * Public key hex getter.
-   * @returns {Hex} The public key as a hex string.
-   */
-  hex(): Hex;
 
   /**
    * Public key equality check. Checks if `this` public key is equal to `other` public key.
@@ -148,21 +147,21 @@ export interface IPublicKey {
 }
 
 /**
- * Interface for class KeyPair
+ * Interface for class KeyPair.
  * @export
  * @interface IKeyPair
  * @type {IKeyPair}
  */
 export interface IKeyPair {
   /**
-   * @type {PublicKey} Get/set the public key associated with the key pair (required)
+   * @type {PublicKey} Get/set the public key associated with the key pair (required).
    */
   readonly publicKey: PublicKey;
 
   /**
    * @readonly
-   * @type {PrivateKey} The private key associated with this key pair (optional)
-   * @throws {KeyPairError} If the private key is not available
+   * @type {PrivateKey} The private key associated with this key pair (optional).
+   * @throws {KeyPairError} If the private key is not available.
    */
   readonly privateKey?: PrivateKey;
 

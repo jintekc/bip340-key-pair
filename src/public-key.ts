@@ -163,7 +163,7 @@ export class PublicKey implements IPublicKey {
    * @see IPublicKey.hex
    * @returns {Hex} The public key as a hex string.
    */
-  public hex(): Hex {
+  get hex(): Hex {
     const hex = Buffer.from(this.bytes).toString('hex');
     return hex;
   }
@@ -175,7 +175,7 @@ export class PublicKey implements IPublicKey {
    * @returns {boolean} True if the public keys are equal, false otherwise.
    */
   public equals(other: PublicKey): boolean {
-    return this.hex() === other.hex();
+    return this.hex === other.hex;
   }
 
   /**
@@ -188,6 +188,7 @@ export class PublicKey implements IPublicKey {
       parity    : this.parity,
       x         : this.x,
       y         : this.y,
+      hex       : this.hex,
       multibase : this.multibase,
       prefix    : this.prefix,
     };

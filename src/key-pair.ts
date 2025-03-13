@@ -32,12 +32,18 @@ export class KeyPair implements IKeyPair {
    */
   constructor({ privateKey, publicKey }: KeyPairParams = {} as KeyPairParams) {
     // If no private key or public key, throw an error
-    if (!privateKey && !publicKey) {
+    if (!publicKey && !privateKey) {
       throw new KeyPairError('Argument missing: must at least provide a publicKey', 'KEYPAIR_CONSTRUCTOR_ERROR');
     }
+    const isPubKeyBytes = publicKey instanceof Uint8Array;
+    const isPrivKeyBytes = privateKey instanceof Uint8Array;
     // Set the private and public keys
-    this._privateKey = privateKey instanceof Uint8Array ? new PrivateKey(privateKey) : privateKey;
-    this._publicKey = publicKey as PublicKey ?? this._privateKey?.computePublicKey();
+    this._privateKey = isPrivKeyBytes ? new PrivateKey(privateKey) : privateKey;
+    this._publicKey = !publicKey
+      ? this.privateKey.computePublicKey()
+      : isPubKeyBytes
+        ? new PublicKey(publicKey)
+        : publicKey;
   }
 
   /**
@@ -150,12 +156,12 @@ export class KeyPairUtils {
    */
   public static equals(keyPair: KeyPair, keyPair1: KeyPair): boolean {
     // Get the public key hex strings for both key pairs
-    const publicKey0 = keyPair.publicKey.hex();
-    const publicKey1 = keyPair1.publicKey.hex();
+    const publicKey0 = keyPair.publicKey.hex;
+    const publicKey1 = keyPair1.publicKey.hex;
 
     // Get the private key hex strings for both key pairs
-    const privateKey0 = keyPair.privateKey.hex();
-    const privateKey1 = keyPair1.privateKey.hex();
+    const privateKey0 = keyPair.privateKey.hex;
+    const privateKey1 = keyPair1.privateKey.hex;
 
     // Return true if the public and private keys are equal
     return publicKey0 === publicKey1 && privateKey0 === privateKey1;

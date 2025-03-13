@@ -23,6 +23,7 @@ export type PublicKeyJSON = {
     parity: number;
     x: PublicKeyBytes;
     y: PublicKeyBytes;
+    hex: Hex;
     multibase: string;
     prefix: PrefixBytes;
 }
