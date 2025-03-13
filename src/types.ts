@@ -13,3 +13,6 @@ export type SignatureBytes = Bytes;
 export type ProofBytes = Bytes;
 export type HashBytes = Bytes;
 export type MessageBytes = Bytes;
+
+export type PrivateKeySecret = bigint;
+export type PrivateKeySeed = PrivateKeyBytes | PrivateKeySecret;

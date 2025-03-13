@@ -1,7 +1,6 @@
-import { Hex, PrefixBytes, PrivateKeyBytes, PublicKeyBytes, PublicKeyMultibaseBytes } from './types.js';
 import { PrivateKey } from './private-key.js';
 import { PublicKey } from './public-key.js';
-import { KeyPair } from './key-pair.js';
+import { Hex, PrefixBytes, PrivateKeyBytes, PublicKeyBytes, PublicKeyMultibaseBytes } from './types.js';
 
 /**
  * Interface for the PrivateKey class.
@@ -30,6 +29,13 @@ export interface IPrivateKey {
   point: BigInt;
 
   /**
+   * Returns the private key as a hex string
+   * @public
+   * @returns {Hex} The private key as a hex string
+   */
+  hex(): Hex;
+
+  /**
    * Checks if this private key is equal to another private key
    * @public
    * @returns {boolean} True if the private keys are equal
@@ -44,12 +50,12 @@ export interface IPrivateKey {
    */
   computePublicKey(): PublicKey;
 
+
   /**
-   * Returns the private key as a hex string
-   * @public
-   * @returns {Hex} The private key as a hex string
+   * Checks if the private key is valid.
+   * @returns {boolean} Whether the private key is valid.
    */
-  hex(): Hex;
+  isValid(bytes?: PrivateKeyBytes): boolean;
 }
 
 
