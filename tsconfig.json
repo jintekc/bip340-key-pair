@@ -18,6 +18,7 @@
   ],
   "exclude": [
     "eslint.config.cjs",
-    "node_modules"
+    "node_modules",
+    "lib"
   ]
 }
