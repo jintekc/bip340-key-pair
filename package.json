@@ -1,6 +1,6 @@
 {
   "name": "@did-btc1/bip340-key-pair",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "JavaScript/TypeScript implementation of a secp256k1 public/private key pairs with BIP340 schnorr signatures. Implementated for use within the @did-btc1/bip340-2025-cryptosuite.",
   "main": "./dist/cjs/index.js",
@@ -13,6 +13,10 @@
       "require": "./dist/cjs/index.js"
     }
   },
+  "files": [
+    "dist",
+    "src"
+  ],
   "license": "MPL-2.0",
   "contributors": [
     {

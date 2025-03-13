@@ -55,7 +55,7 @@ export interface IPrivateKey {
    * Checks if the private key is valid.
    * @returns {boolean} Whether the private key is valid.
    */
-  isValid(bytes?: PrivateKeyBytes): boolean;
+  isValid(): boolean;
 }
 
 
@@ -85,12 +85,6 @@ export interface IPublicKey {
   parity: number;
 
   /**
-   * Public key multibase prefix getter
-   * @type {PrefixBytes} The 2 byte multibase prefix
-   */
-  prefix: PrefixBytes;
-
-  /**
    * Public key x-coordinate getter
    * @type {PublicKeyBytes} The 32 byte x-coordinate of the public key
    */
@@ -107,6 +101,12 @@ export interface IPublicKey {
    * @returns {string} The public key as a base58btc multibase string
    */
   multibase: string;
+
+  /**
+   * Public key multibase prefix getter
+   * @type {PrefixBytes} The 2 byte multibase prefix
+   */
+  prefix: PrefixBytes;
 
   /**
    * Decode the base58btc multibase string to the compressed public key prefixed with 0x02
@@ -141,8 +141,10 @@ export interface IPublicKey {
  * @type {IKeyPair}
  */
 export interface IKeyPair {
-  /** @readonly @type {PublicKey} Get/set the public key associated with the key pair (required) */
-  readonly publicKey: PublicKey;
+  /**
+   * @type {PublicKey} Get/set the public key associated with the key pair (required)
+   */
+  publicKey: PublicKey;
 
   /**
    * @readonly
