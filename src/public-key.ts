@@ -1,11 +1,10 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { base58btc } from 'multiformats/bases/base58';
-import * as tinysecp from 'tiny-secp256k1';
-import { Hex, PrefixBytes, PrivateKeyBytes, PublicKeyBytes, PublicKeyMultibaseBytes } from './types.js';
-import { PublicKeyError } from './error.js';
 import { BIP340_MULTIKEY_PREFIX, BIP340_MULTIKEY_PREFIX_HASH, CURVE } from './constants.js';
+import { PublicKeyError } from './error.js';
 import { IPublicKey } from './interface.js';
-import { PrivateKey, PrivateKeyUtils } from './private-key.js';
+import { PrivateKey } from './private-key.js';
+import { Hex, PrefixBytes, PrivateKeyBytes, PublicKeyBytes, PublicKeyMultibaseBytes } from './types.js';
 
 /**
  * Encapsulates a secp256k1 public key.
@@ -44,42 +43,70 @@ export class PublicKey implements IPublicKey {
       : bytes;
   }
 
-  /** @see IPublicKey.compressed */
+  /**
+   * Get the public key bytes.
+   * @see IPublicKey.bytes
+   * @returns {Uint8Array} The public key bytes
+   */
   get bytes(): Uint8Array {
     return new Uint8Array(this._bytes);
   }
 
-  /** @see IPublicKey.uncompressed */
+  /**
+   * Get the uncompressed public key.
+   * @see IPublicKey.uncompressed
+   * @returns {Uint8Array} The 65-byte uncompressed public key (0x04, x, y).
+   */
   get uncompressed(): PublicKeyBytes {
     return this.utils.liftX(this.x);
   }
 
-  /** @see IPublicKey.parity */
+  /**
+   * Get the parity byte of the public key.
+   * @see IPublicKey.parity
+   * @returns {number} The parity byte of the public key.
+   */
   get parity(): number {
     const parityb = this.bytes[0];
     return parityb;
   }
 
-  /** @see IPublicKey.x */
+  /**
+   * Get the x-coordinate of the public key.
+   * @see IPublicKey.x
+   * @returns {Uint8Array} The 32-byte x-coordinate of the public key.
+   */
   get x(): PublicKeyBytes {
     return this.bytes.slice(1, 33);
   }
 
-  /** @see IPublicKey.y */
+  /**
+   * Get the y-coordinate of the public key.
+   * @see IPublicKey.y
+   * @returns {Uint8Array} The 32-byte y-coordinate of the public key.
+   */
   get y(): PublicKeyBytes {
     return this.uncompressed.slice(33, 65);
   }
 
-  /** @see IPublicKey.multibase */
+  /**
+   * Get the multibase public key.
+   * @see IPublicKey.multibase
+   * @returns {string} The public key in base58btc x-only multibase format.
+   */
   get multibase(): string {
     return this.encode();
   }
 
-  /** @see IPublicKey.prefix */
+  /**
+   * Get the public key prefix bytes.
+   * @see IPublicKey.prefix
+   * @returns {PrefixBytes} The 2-byte prefix of the public key.
+   */
   get prefix(): PrefixBytes {
-    return this.decode();
+    const multibase = this.decode();
+    return multibase.subarray(0, 2);
   }
-
 
   /**
    * Decodes the multibase string to the 34-byte corresponding public key (2 byte prefix + 32 byte public key).
@@ -130,12 +157,21 @@ export class PublicKey implements IPublicKey {
     return base58btc.encode(multikeyBytes);
   }
 
-  /** @see IPublicKey.hex */
+  /**
+   * Returns the raw public key as a hex string.
+   * @see IPublicKey.hex
+   * @returns {Hex} The public key as a hex string.
+   */
   public hex(): Hex {
     return Buffer.from(this.bytes).toString('hex');
   }
 
-  /** @see IPublicKey.equals */
+  /**
+   * Compares this public key to another public key.
+   * @see IPublicKey.equals
+   * @param {PublicKey} other The other public key to compare
+   * @returns {boolean} True if the public keys are equal, false otherwise.
+   */
   public equals(other: PublicKey): boolean {
     return this.hex() === other.hex();
   }
@@ -168,37 +204,6 @@ export class PublicKeyUtils {
 
     // Return a new PublicKey object
     return privateKey.computePublicKey();
-  }
-
-  /**
-   * Generates random public key bytes.
-   * @warning DOES NOT RETURN PRIVATE KEY! DO NOT USE IN PRODUCTION!
-   * @static
-   * @returns {PublicKeyBytes} Uint8Array of 32 random bytes.
-   */
-  public static random(compressed?: boolean): PublicKeyBytes {
-    // Generate random private key bytes
-    const privateKeyBytes = PrivateKeyUtils.random();
-    // Generate public key bytes from private key bytes
-    const publicKeyBytes = tinysecp.pointFromScalar(privateKeyBytes, compressed ?? true);
-    // If no public key bytes, throw error
-    if (!publicKeyBytes) {
-      throw new PublicKeyError('Missing public key: failed to generate public key', 'RANDOM_PUBLIC_KEY_FAILED');
-    }
-    // Return the public key bytes
-    return publicKeyBytes;
-  }
-
-  /**
-   * Generates a new PublicKey from random bytes.
-   * @static
-   * @returns {PublicKey} A new PublicKey object
-   */
-  public static generate(): PublicKey {
-    // Generate random public key bytes
-    const publicKeyBytes = this.random();
-    // Return a new PublicKey object
-    return new PublicKey(publicKeyBytes);
   }
 
   /**

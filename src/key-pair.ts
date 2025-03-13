@@ -1,7 +1,7 @@
 import { PrivateKeyBytes, PublicKeyBytes } from './types.js';
 import { KeyPairError } from './error.js';
 import { IKeyPair } from './interface.js';
-import { PrivateKey } from './private-key.js';
+import { PrivateKey, PrivateKeyUtils } from './private-key.js';
 import { PublicKey } from './public-key.js';
 
 /** Params for the {@link KeyPair} constructor */
@@ -40,18 +40,31 @@ export class KeyPair implements IKeyPair {
     this._publicKey = publicKey as PublicKey ?? this._privateKey?.computePublicKey();
   }
 
-  /** @see IKeyPair.publicKey */
+  /**
+   * Set the PublicKey.
+   * @see IKeyPair.publicKey
+   * @param {PublicKey} publicKey The PublicKey object
+   */
   set publicKey(publicKey: PublicKey) {
     this._publicKey = publicKey;
   }
 
-  /** @see IKeyPair.publicKey */
+  /**
+   * Get the PublicKey.
+   * @see IKeyPair.publicKey
+   * @returns {PublicKey} The PublicKey object
+   */
   get publicKey(): PublicKey {
     const publicKey = this._publicKey;
     return publicKey;
   }
 
-  /** @see IKeyPair.privateKey */
+  /**
+   * Set the PrivateKey.
+   * @see IKeyPair.privateKey
+   * @returns {PrivateKey} The PrivateKey object
+   * @throws {KeyPairError} If the private key is not available
+   */
   get privateKey(): PrivateKey {
     if(!this._privateKey) {
       throw new KeyPairError('Private key not available', 'PRIVATE_KEY_ERROR');
@@ -71,13 +84,13 @@ export class KeyPairUtils {
   /**
    * Static method creates a new KeyPair from a PrivateKey object or private key bytes.
    * @static
-   * @param {PrivateKey | PrivateKeyBytes} pk The private key bytes
+   * @param {PrivateKey | PrivateKeyBytes} data The private key bytes
    * @returns {KeyPair} A new KeyPair object
    */
-  public static fromPrivateKey(pk: PrivateKey | PrivateKeyBytes): KeyPair {
+  public static fromPrivateKey(data: PrivateKey | PrivateKeyBytes): KeyPair {
 
     // If the private key is a PrivateKey object, get the raw bytes else use the bytes
-    const bytes = pk instanceof PrivateKey ? pk.bytes : pk;
+    const bytes = data instanceof PrivateKey ? data.bytes : data;
 
     // Throw error if the private key is not 32 bytes
     if(bytes.length !== 32) {
@@ -85,7 +98,7 @@ export class KeyPairUtils {
     }
 
     // If pk Uint8Array, construct PrivateKey object else use the object
-    const privateKey = pk instanceof Uint8Array ? new PrivateKey(pk) : pk;
+    const privateKey = data instanceof Uint8Array ? new PrivateKey(data) : data;
 
     // Compute the public key from the private key
     const publicKey = privateKey.computePublicKey();
@@ -94,16 +107,26 @@ export class KeyPairUtils {
     return new KeyPair({ privateKey, publicKey });
   }
 
+  public static fromSecret(secret: bigint): PrivateKey {
+    return PrivateKeyUtils.fromSecret(secret);
+  }
+
   /**
-   * Static method generates a new KeyPair (PrivateKey, PublicKey).
+   * Static method to generate a new random PrivateKey / PublicKey KeyPair.
    * @static
-   * @returns {KeyPair} A new KeyPair object
+   * @returns {KeyPair} A new PrivateKey object.
    */
   public static generate(): KeyPair {
-    const privateKey = PrivateKey.generate();
-    // Derive the public key from the private key
+    // Generate random private key bytes
+    const privateKeyBytes = PrivateKeyUtils.randomBytes();
+
+    // Construct a new PrivateKey object
+    const privateKey = new PrivateKey(privateKeyBytes);
+
+    // Compute the public key from the private key
     const publicKey = privateKey.computePublicKey();
-    // Return a randomly generated KeyPair
+
+    // Return a new KeyPair object
     return new KeyPair({ privateKey, publicKey });
   }
 }
