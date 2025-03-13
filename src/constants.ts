@@ -17,10 +17,10 @@ export const Gx = 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f8
 // base point y
 export const Gy = 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n;
 // curve parameters
-export const a = BigInt(0n);
-export const b = BigInt(7n);
-export const p = BigInt(P);
-export const n = BigInt(N);
+export const a = 0n;
+export const b = 7n;
+export const p = P;
+export const n = N;
 export const CURVE = {
   p,
   n,

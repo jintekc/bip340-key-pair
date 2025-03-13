@@ -4,7 +4,7 @@ import { BIP340_MULTIKEY_PREFIX, BIP340_MULTIKEY_PREFIX_HASH, CURVE } from './co
 import { PublicKeyError } from './error.js';
 import { IPublicKey } from './interface.js';
 import { PrivateKey } from './private-key.js';
-import { Hex, PrefixBytes, PrivateKeyBytes, PublicKeyBytes, PublicKeyMultibaseBytes } from './types.js';
+import { Hex, PrefixBytes, PrivateKeyBytes, PublicKeyBytes, PublicKeyJSON, PublicKeyMultibaseBytes } from './types.js';
 
 /**
  * Encapsulates a secp256k1 public key.
@@ -16,9 +16,6 @@ import { Hex, PrefixBytes, PrivateKeyBytes, PublicKeyBytes, PublicKeyMultibaseBy
  * @implements {IPublicKey}
  */
 export class PublicKey implements IPublicKey {
-  /** @type {PublicKeyUtils} Static PublicKeyUtils class instance */
-  public utils: PublicKeyUtils = new PublicKeyUtils();
-
   /** @type {PublicKeyBytes} The Uint8Array public key */
   private readonly _bytes: PublicKeyBytes;
 
@@ -49,7 +46,8 @@ export class PublicKey implements IPublicKey {
    * @returns {Uint8Array} The public key bytes
    */
   get bytes(): Uint8Array {
-    return new Uint8Array(this._bytes);
+    const bytes = new Uint8Array(this._bytes);
+    return bytes;
   }
 
   /**
@@ -58,7 +56,8 @@ export class PublicKey implements IPublicKey {
    * @returns {Uint8Array} The 65-byte uncompressed public key (0x04, x, y).
    */
   get uncompressed(): PublicKeyBytes {
-    return this.utils.liftX(this.x);
+    const uncompressed = PublicKeyUtils.liftX(this.x);
+    return uncompressed;
   }
 
   /**
@@ -67,8 +66,8 @@ export class PublicKey implements IPublicKey {
    * @returns {number} The parity byte of the public key.
    */
   get parity(): number {
-    const parityb = this.bytes[0];
-    return parityb;
+    const parity = this.bytes[0];
+    return parity;
   }
 
   /**
@@ -77,7 +76,8 @@ export class PublicKey implements IPublicKey {
    * @returns {Uint8Array} The 32-byte x-coordinate of the public key.
    */
   get x(): PublicKeyBytes {
-    return this.bytes.slice(1, 33);
+    const x = this.bytes.slice(1, 33);
+    return x;
   }
 
   /**
@@ -86,7 +86,8 @@ export class PublicKey implements IPublicKey {
    * @returns {Uint8Array} The 32-byte y-coordinate of the public key.
    */
   get y(): PublicKeyBytes {
-    return this.uncompressed.slice(33, 65);
+    const y = this.uncompressed.slice(33, 65);
+    return y;
   }
 
   /**
@@ -104,8 +105,8 @@ export class PublicKey implements IPublicKey {
    * @returns {PrefixBytes} The 2-byte prefix of the public key.
    */
   get prefix(): PrefixBytes {
-    const multibase = this.decode();
-    return multibase.subarray(0, 2);
+    const prefix = this.decode().subarray(0, 2);
+    return prefix;
   }
 
   /**
@@ -162,8 +163,9 @@ export class PublicKey implements IPublicKey {
    * @see IPublicKey.hex
    * @returns {Hex} The public key as a hex string.
    */
-  public hex(): Hex {
-    return Buffer.from(this.bytes).toString('hex');
+  get hex(): Hex {
+    const hex = Buffer.from(this.bytes).toString('hex');
+    return hex;
   }
 
   /**
@@ -173,7 +175,23 @@ export class PublicKey implements IPublicKey {
    * @returns {boolean} True if the public keys are equal, false otherwise.
    */
   public equals(other: PublicKey): boolean {
-    return this.hex() === other.hex();
+    return this.hex === other.hex;
+  }
+
+  /**
+   * Public key JSON representation.
+   * @see IPublicKey.json
+   * @returns {PublicKeyJSON} The public key as a JSON object.
+   */
+  public json(): PublicKeyJSON {
+    return {
+      parity    : this.parity,
+      x         : this.x,
+      y         : this.y,
+      hex       : this.hex,
+      multibase : this.multibase,
+      prefix    : this.prefix,
+    };
   }
 }
 
@@ -215,7 +233,7 @@ export class PublicKeyUtils {
    * @param {bigint} mod The modulus value
    * @returns {bigint} The result of the modular exponentiation
    */
-  public modPow(base: bigint, exp: bigint, mod: bigint): bigint {
+  public static modPow(base: bigint, exp: bigint, mod: bigint): bigint {
     let result = 1n;
     while (exp > 0n) {
       if (exp & 1n) result = (result * base) % mod;
@@ -233,7 +251,7 @@ export class PublicKeyUtils {
    * @param {bigint} p The prime modulus
    * @returns {bigint} The square root of `a` mod `p`
    */
-  public sqrtMod(a: bigint, p: bigint): bigint {
+  public static sqrtMod(a: bigint, p: bigint): bigint {
     return this.modPow(a, (p + 1n) >> 2n, p);
   };
 
@@ -242,7 +260,7 @@ export class PublicKeyUtils {
    * @param xBytes 32-byte x-coordinate
    * @returns {Uint8Array} 65-byte uncompressed public key (starts with `0x04`)
    */
-  public liftX(xBytes: Uint8Array): Uint8Array {
+  public static liftX(xBytes: Uint8Array): Uint8Array {
     // Ensure x-coordinate is 32 bytes
     if (xBytes.length !== 32) {
       throw new PublicKeyError('Invalid argument: x-coordinate length must be 32 bytes', 'LIFT_X_ERROR');

@@ -1,4 +1,4 @@
-import { PrivateKeyBytes, PublicKeyBytes } from './types.js';
+import { Hex, KeyBytes, KeyPairJSON, PrivateKeyBytes, PublicKeyBytes } from './types.js';
 import { KeyPairError } from './error.js';
 import { IKeyPair } from './interface.js';
 import { PrivateKey, PrivateKeyUtils } from './private-key.js';
@@ -32,12 +32,18 @@ export class KeyPair implements IKeyPair {
    */
   constructor({ privateKey, publicKey }: KeyPairParams = {} as KeyPairParams) {
     // If no private key or public key, throw an error
-    if (!privateKey && !publicKey) {
+    if (!publicKey && !privateKey) {
       throw new KeyPairError('Argument missing: must at least provide a publicKey', 'KEYPAIR_CONSTRUCTOR_ERROR');
     }
+    const isPubKeyBytes = publicKey instanceof Uint8Array;
+    const isPrivKeyBytes = privateKey instanceof Uint8Array;
     // Set the private and public keys
-    this._privateKey = privateKey instanceof Uint8Array ? new PrivateKey(privateKey) : privateKey;
-    this._publicKey = publicKey as PublicKey ?? this._privateKey?.computePublicKey();
+    this._privateKey = isPrivKeyBytes ? new PrivateKey(privateKey) : privateKey;
+    this._publicKey = !publicKey
+      ? this.privateKey.computePublicKey()
+      : isPubKeyBytes
+        ? new PublicKey(publicKey)
+        : publicKey;
   }
 
   /**
@@ -71,6 +77,19 @@ export class KeyPair implements IKeyPair {
     }
     const privateKey = this._privateKey;
     return privateKey;
+  }
+
+
+  /**
+   * JSON representation of a KeyPair.
+   * @see IKeyPair.json
+   * @returns {KeyPairJSON} The KeyPair as a JSON object
+   */
+  public json(): KeyPairJSON {
+    return {
+      privateKey : this.privateKey.json(),
+      publicKey  : this.publicKey.json()
+    };
   }
 }
 
@@ -107,8 +126,45 @@ export class KeyPairUtils {
     return new KeyPair({ privateKey, publicKey });
   }
 
-  public static fromSecret(secret: bigint): PrivateKey {
-    return PrivateKeyUtils.fromSecret(secret);
+  /**
+   * Static method creates a new KeyPair (PrivateKey/PublicKey) bigint secret.
+   * @static
+   * @param {bigint} secret The private key secret
+   * @returns {KeyPair} A new KeyPair object
+   */
+  public static fromSecret(secret: bigint): KeyPair {
+    const privateKey = PrivateKeyUtils.fromSecret(secret);
+    const publicKey = privateKey.computePublicKey();
+    return new KeyPair({ privateKey, publicKey });
+  }
+
+  /**
+   * Converts key bytes to a hex string.
+   * @static
+   * @param {KeyBytes} keyBytes The key bytes (private or public).
+   * @returns {Hex} The key bytes as a hex string.
+   */
+  public static toHex(keyBytes: KeyBytes): Hex {
+    return Buffer.from(keyBytes).toString('hex');
+  }
+
+  /**
+   * Compares two KeyPair objects for equality.
+   * @param {KeyPair} keyPair The main keyPair.
+   * @param {KeyPair} keyPair1 The other keyPair.
+   * @returns {boolean} True if the public key and private key hex are equal, false otherwise.
+   */
+  public static equals(keyPair: KeyPair, keyPair1: KeyPair): boolean {
+    // Get the public key hex strings for both key pairs
+    const publicKey0 = keyPair.publicKey.hex;
+    const publicKey1 = keyPair1.publicKey.hex;
+
+    // Get the private key hex strings for both key pairs
+    const privateKey0 = keyPair.privateKey.hex;
+    const privateKey1 = keyPair1.privateKey.hex;
+
+    // Return true if the public and private keys are equal
+    return publicKey0 === publicKey1 && privateKey0 === privateKey1;
   }
 
   /**

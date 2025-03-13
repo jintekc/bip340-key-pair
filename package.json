@@ -1,6 +1,6 @@
 {
   "name": "@did-btc1/bip340-key-pair",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "description": "JavaScript/TypeScript implementation of a secp256k1 public/private key pairs with BIP340 schnorr signatures. Implementated for use within the @did-btc1/bip340-2025-cryptosuite.",
   "main": "./dist/cjs/index.js",
@@ -65,7 +65,7 @@
     "build": "pnpm clean && pnpm build:esm && pnpm build:cjs",
     "build:esm": "rimraf dist/esm dist/types && pnpm tsc -p tsconfig.json",
     "build:cjs": "rimraf dist/cjs && tsc -p tsconfig.cjs.json && echo '{\"type\": \"commonjs\"}' > ./dist/cjs/package.json",
-    "build:tests": "rimraf tests/compiled && pnpm tsc -p tests/tsconfig.json",
+    "build:tests": "pnpm build && pnpm tsc -p tests/tsconfig.json",
     "release": "pnpm build && pnpm pack && mv *.tgz releases",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
